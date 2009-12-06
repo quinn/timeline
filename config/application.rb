@@ -10,7 +10,7 @@ class Timeline2 < Rails::Application
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named
-  # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
+  config.plugins = [ :all ]
 
   # Skip frameworks you're not going to use. To use Rails without a database,
   # you must remove the Active Record framework.
@@ -26,9 +26,9 @@ class Timeline2 < Rails::Application
 
   # Configure generators values. Many other options are available, be sure to
   # check the documentation.
-  # config.generators do |g|
-  #   g.orm             :active_record
-  #   g.template_engine :erb
+  config.generators do |g|
+    g.orm             :active_record
+    g.template_engine :erb
   #   g.test_framework  :test_unit, :fixture => true
-  # end
+  end
 end
