@@ -10,6 +10,7 @@ function log(val, name) {
   }
 };
 
+// '#'+(Math.random()*0xFFFFFF<<0).toString(16);
 function random_color(format) {
   var rint = Math.round(0xffffff * Math.random());
   switch(format)
@@ -43,7 +44,7 @@ function Entry(timeline, color, start) {
   } else {
     this.color = color;
     this.start = start;
-    this.dom = $('<div id="'+ this.start.getTime() +'"class="entry"><div class="current_time"></div></div')
+    this.dom = $('<div id="'+ this.start.getTime() +'"class="entry"><a href="#tag">(tags)</a><div class="current_time"></div></div')
       .css('background-color', this.color);
   }
   
@@ -72,6 +73,10 @@ function Entry(timeline, color, start) {
     return this;
   }
   
+  this.tag = function() {
+    
+  }
+  
   return this;
 }
 
@@ -97,7 +102,7 @@ function Timeline(timeline_div) {
   
   this.new_entry = function() {
     var previous_start;
-    if (this.current_entry) previous_start = previous_entry.start.getTime();
+    if (this.current_entry) previous_start = this.current_entry.start.getTime();
     this.current_entry = new Entry(this, random_color('hex'), now())
       .save({'entry[parent]': previous_start})
       .append();
@@ -116,6 +121,15 @@ jQuery(function($) {
   $('a[href=#start]').live('click', function() {
     timeline.new_entry();
     return false;
+  });
+  
+  $('a[href=#tag]').live('click', function() {
+    var tag_link = $(this);
+    var entry = new Entry(timeline, tag_link.parents('.entry'));
+    var tag_field = $('input[name=tags]');
+    entry.save({'entry[tags]': tag_field.val()});
+    tag_link.text(tag_field.val());
+    tag_field.val('');
   });
   
   $('a[href=#stop]').live('click', function() {

@@ -10,7 +10,8 @@ class Entry
   property :started_at, DateTime, :key => true
   property :ended_at, DateTime, :nullable => true
   property :color, String, :length => 18
-
+  property :tags, Object
+  
   has 1, :previous_entry, :model => 'Entry', :child_key => [ :ended_at ]
   belongs_to :next_entry, :model => 'Entry', :child_key => [ :ended_at ]
   
@@ -28,6 +29,13 @@ class Entry
     started_at.strftime('%l:%M') + started_at.strftime(' %p').downcase
   end
   
+  def full_time
+    started_at.strftime('%l:%M') + started_at.strftime(' %p').downcase +
+    " - "+ ended_at.strftime('%l:%M') + ended_at.strftime(' %p').downcase
+  rescue
+    short_time
+  end
+  
   def raw_time= milliseconds
     self.started_at = Time.at(milliseconds.to_i / 1000.0)
   end
@@ -37,9 +45,11 @@ class Entry
   end
   
   def parent= milliseconds
-    entry = Entry.get! Time.at(milliseconds.to_i / 1000.0)
-    entry.next_entry = self
-    entry.save
+    entry = Entry.get Time.at(milliseconds.to_i / 1000.0)
+    if entry
+      entry.next_entry = self
+      entry.save
+    end
   end
   
   def self.each_hour
@@ -58,7 +68,14 @@ class Entry
     dom = {
       :id => started_at.milliseconds, 
       :style => "background-color: #{color}" }
-    dom.merge! :'data-ended_at' => ended_at.milliseconds if ended_at
+    if ended_at
+      dom.merge! :'data-ended_at' => ended_at.milliseconds 
+      dom[:style] += "; width: #{width}%"
+    end
     dom
+  end
+  
+  def width
+    ((ended_at.milliseconds - started_at.milliseconds) / (1.hour * 1000.0)) * 100
   end
 end

@@ -2,10 +2,14 @@
 =link_to 'Start', '#start'
 =link_to 'Stop', '#stop'
 #stopped_at
+#tag_form
+  Tags
+  =text_field_tag 'tags'
 #timeline
--Entry.each_hour do |entries, hour|
-  .hour{:id => "hour-#{hour}"}
-    -if entries
-      -entries.each do |entry|
-        .entry{entry.to_dom}
-          .current_time= entry.short_time
+  -Entry.each_hour do |entries, hour|
+    .hour{:id => "hour-#{hour}"}
+      -if entries
+        -entries.each do |entry|
+          .entry{entry.to_dom}
+            =h link_to( (entry.tags || '(tags)'), '#tag' )
+            .current_time= entry.full_time
