@@ -28,17 +28,24 @@ function random_color(format) {
   }
 }
 
-function now() {
+function now(setting) {
   var date = new Date();
+  if (setting) date.setTime(setting);
   return date;
 };
 
 function Entry(timeline, color, start) {
   this.timeline = timeline;
-  this.color = color;
-  this.start = start;
-  this.dom = $('<div id="'+ this.start.getTime() +'"class="entry"></div')
-    .css('background-color', this.color);
+  if (typeof color == 'object') {
+    this.dom = color;
+    this.start = now(this.dom.attr('id'));
+    this.color = this.dom.css('background-color');
+  } else {
+    this.color = color;
+    this.start = start;
+    this.dom = $('<div id="'+ this.start.getTime() +'"class="entry"><div class="current_time"></div></div')
+      .css('background-color', this.color);
+  }
   
   this.append = function() {
     this.timeline.dom
@@ -53,10 +60,9 @@ function Entry(timeline, color, start) {
       'entry[color]': this.color }
   }
   
-  this.save = function(previous_entry, previous_start) {
-    if (previous_entry) var previous_start = previous_entry.start.getTime();
+  this.save = function(params) {
     var timeline = this.timeline;
-    $.post('entries', $.extend({}, this.data(), {'entry[parent]': previous_start}), function (data, status) {
+    $.post('entries', $.extend({}, this.data(), params), function (data, status) {
       clearInterval(timeline.interval);
       timeline.interval = setInterval(function () {
         timeline.watch_timeline();
@@ -71,33 +77,49 @@ function Entry(timeline, color, start) {
 
 function Timeline(timeline_div) {
   this.dom = $(timeline_div);
-  this.current_entry;
-  this.current_start;
-  this.interval;
-
+  
+  if (typeof $('.entry:last').attr('data-ended_at') == 'undefined') {
+    this.current_entry = new Entry(this, $('.entry:last'));
+    var timeline = this;
+    this.interval = setInterval(function () {
+      timeline.watch_timeline();
+    }, 500);
+  }
+  
   this.watch_timeline = function() {
     var diff = now().getTime() - this.current_entry.start.getTime();
     var percent = diff / one_hour * 100;
-    if (percent <= 100) {
-      this.current_entry.dom
-        .css('width', percent + '%')
+    this.current_entry.dom
+      .css('width', percent + '%')
+      .find('.current_time')
         .text(now().toString());
-    }
   }
   
   this.new_entry = function() {
+    var previous_start;
+    if (this.current_entry) previous_start = previous_entry.start.getTime();
     this.current_entry = new Entry(this, random_color('hex'), now())
-      .save(this.current_entry)
+      .save({'entry[parent]': previous_start})
       .append();
+  }
+  
+  this.stop = function() {
+    this.current_entry.save({'entry[raw_ending]': now().getTime()})
+    clearInterval(this.interval);
+    this.current_entry = undefined;
   }
 }
 
 jQuery(function($) {
-  var start_link = $('a[href=#start]');
   var timeline = new Timeline('#timeline');
   
-  start_link.live('click', function() {
+  $('a[href=#start]').live('click', function() {
     timeline.new_entry();
+    return false;
+  });
+  
+  $('a[href=#stop]').live('click', function() {
+    timeline.stop();
     return false;
   });
 });

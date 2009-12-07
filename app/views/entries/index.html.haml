@@ -1,0 +1,11 @@
+#started_at
+=link_to 'Start', '#start'
+=link_to 'Stop', '#stop'
+#stopped_at
+#timeline
+-Entry.each_hour do |entries, hour|
+  .hour{:id => "hour-#{hour}"}
+    -if entries
+      -entries.each do |entry|
+        .entry{entry.to_dom}
+          .current_time= entry.short_time

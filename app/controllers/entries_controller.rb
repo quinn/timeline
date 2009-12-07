@@ -1,6 +1,9 @@
 class EntriesController < ApplicationController
+  def index
+  end
+  
   def create
-    entry = Entry.create(params[:entry])
+    entry = Entry.create_or_update(params[:entry])
     render :text => entry.short_time
   end
 end
