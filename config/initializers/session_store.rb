@@ -5,7 +5,7 @@
 # Make sure the secret is at least 30 characters and all random, 
 # no regular words or you'll be exposed to dictionary attacks.
 ActionController::Base.session = {
-  :key         => '_timeline2_session',
+  :key         => '_timeline_session',
   :secret      => 'fbc2416fa60d83fa5250372900d5481f72be3fd00861728eec61bf837ee2a31479ae014a425108adb870c50f980613aad2d482f648cedd12975c805659b741ac'
 }
 

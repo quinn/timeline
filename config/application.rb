@@ -1,6 +1,6 @@
 require File.expand_path('../boot', __FILE__)
 
-class Timeline2 < Rails::Application
+class Timeline < Rails::Application
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers
   # -- all .rb files in that directory are automatically loaded.
@@ -26,9 +26,9 @@ class Timeline2 < Rails::Application
 
   # Configure generators values. Many other options are available, be sure to
   # check the documentation.
-  config.generators do |g|
-    g.orm             :datamapper
-    g.template_engine :haml
-  #   g.test_framework  :test_unit, :fixture => true
-  end
+  # config.generators do |g|
+  #   g.orm             :datamapper
+  #   g.template_engine :haml
+  # #   g.test_framework  :test_unit, :fixture => true
+  # end
 end

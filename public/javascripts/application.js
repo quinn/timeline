@@ -38,7 +38,7 @@ jQuery(function($) {
   start_link.live('click', function() {
     start = now();
     
-    $.post('entry', {started_at: start.getTime()}, function (data, status) {
+    $.post('entry', {'entry[started_at]': start.getTime()}, function (data, status) {
       
     });
     $('#started_at');
