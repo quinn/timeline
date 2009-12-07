@@ -1,5 +1,7 @@
 # Use Bundler (preferred)
 environment = File.expand_path('../../vendor/gems/environment', __FILE__)
+puts environment
+
 if File.exist?("#{environment}.rb")
   require environment
 
