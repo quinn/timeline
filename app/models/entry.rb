@@ -10,7 +10,7 @@ class Entry
   property :started_at, DateTime, :key => true
   property :ended_at, DateTime, :nullable => true
   property :color, String, :length => 18
-  property :tags, Object
+  property :tags, Text
   
   has 1, :previous_entry, :model => 'Entry', :child_key => [ :ended_at ]
   belongs_to :next_entry, :model => 'Entry', :child_key => [ :ended_at ]
@@ -45,11 +45,7 @@ class Entry
   end
   
   def parent= milliseconds
-    entry = Entry.get Time.at(milliseconds.to_i / 1000.0)
-    if entry
-      entry.next_entry = self
-      entry.save
-    end
+    self.previous_entry = Entry.get!( Time.at(milliseconds.to_i / 1000.0) )
   end
   
   def self.each_hour
@@ -77,5 +73,45 @@ class Entry
   
   def width
     ((ended_at.milliseconds - started_at.milliseconds) / (1.hour * 1000.0)) * 100
+  end
+  
+  def length
+    ended_at.to_f - started_at.to_f
+  end
+  
+  # big for now. will make real l8r
+  def self.todays_tags
+    tags = {}
+    returning = []
+    between(Time.now.beginning_of_day, Time.now.end_of_day).each do |entry|
+      entry.tags.split(",").map{|t| t.strip}.each do |tag|
+        tags[tag] ||= []
+        tags[tag] << entry
+      end
+    end
+    
+    tags.each do |tag, entries|
+      total_time = 0.0
+      catch(:ongoing) do      
+        entries.each do |entry|
+          total_time += entry.length
+          if entry.ended_at.nil?
+            total_time = "ongoing"
+            throw(:ongoing)
+          end
+        end
+        seconds = ((total_time % 3600) / 60).round
+        seconds = (seconds.to_s.length == 1) ? "0#{seconds}" : seconds
+        total_time = "#{(total_time / 3600).floor}:#{seconds}"
+      end
+      
+      returning << {
+        :tag => tag,
+        :entries => entries,
+        :total_time => total_time
+      }
+    end
+    
+    returning
   end
 end
