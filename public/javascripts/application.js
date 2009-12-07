@@ -1,4 +1,8 @@
+
+var one_hour = 1000 * 60 * 60.0;
+
 function log(val, name) {
+  if (typeof console == 'undefined') return "can't log";
   if (name) {
     console.log('the value of ' + name + ' is ' + val);
   } else {
@@ -24,37 +28,76 @@ function random_color(format) {
   }
 }
 
-jQuery(function($) {
+function now() {
+  var date = new Date();
+  return date;
+};
+
+function Entry(timeline, color, start) {
+  this.timeline = timeline;
+  this.color = color;
+  this.start = start;
+  this.dom = $('<div id="'+ this.start.getTime() +'"class="entry"></div')
+    .css('background-color', this.color);
   
-  var start_link = $('a[href=#start]');
-  var timeline = $('#timeline');
-  var start = 0;
-  var one_hour = 1000 * 60 * 60.0;
-  var now = function () {
-    var date = new Date();
-    return date;
-  };
-  
-  start_link.live('click', function() {
-    start = now();
+  this.append = function() {
+    this.timeline.dom
+      .append(this.dom);
     
-    $.post('entry', {'entry[started_at]': start.getTime()}, function (data, status) {
-      
-    });
-    $('#started_at');
-    return false;
-  });
+    return this;
+  }
   
-  setInterval(function() {
-    var diff = now().getTime() - start;
+  this.data = function () {
+    return {
+      'entry[raw_time]': this.start.getTime(), 
+      'entry[color]': this.color }
+  }
+  
+  this.save = function(previous_entry, previous_start) {
+    if (previous_entry) var previous_start = previous_entry.start.getTime();
+    var timeline = this.timeline;
+    $.post('entries', $.extend({}, this.data(), {'entry[parent]': previous_start}), function (data, status) {
+      clearInterval(timeline.interval);
+      timeline.interval = setInterval(function () {
+        timeline.watch_timeline();
+      }, 500);
+    });
+    
+    return this;
+  }
+  
+  return this;
+}
+
+function Timeline(timeline_div) {
+  this.dom = $(timeline_div);
+  this.current_entry;
+  this.current_start;
+  this.interval;
+
+  this.watch_timeline = function() {
+    var diff = now().getTime() - this.current_entry.start.getTime();
     var percent = diff / one_hour * 100;
     if (percent <= 100) {
-      timeline
+      this.current_entry.dom
         .css('width', percent + '%')
-        .find('.current_time')
-          .text(now().toString());
+        .text(now().toString());
     }
-  }, 500);
+  }
   
-  timeline.css('background-color', random_color('hex'));
+  this.new_entry = function() {
+    this.current_entry = new Entry(this, random_color('hex'), now())
+      .save(this.current_entry)
+      .append();
+  }
+}
+
+jQuery(function($) {
+  var start_link = $('a[href=#start]');
+  var timeline = new Timeline('#timeline');
+  
+  start_link.live('click', function() {
+    timeline.new_entry();
+    return false;
+  });
 });

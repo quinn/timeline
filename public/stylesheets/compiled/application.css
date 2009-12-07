@@ -6,6 +6,6 @@ a {
   text-decoration: none;
   color: #cfcfcf; }
 
-#timeline {
+#timeline .entry {
   height: 200px;
   width: 0%; }
