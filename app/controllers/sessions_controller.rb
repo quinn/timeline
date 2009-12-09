@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
     def open_id_authentication
       authenticate_with_open_id do |result, identity_url|
         if result.successful?
-          if @current_user = User.get(identity_url) || User.create(:openid => identity_url)
+          if self.current_user = User.get(identity_url) || User.create(:openid => identity_url)
             successful_login
           else
             failed_login "Sorry, my hands are made of jello"
@@ -25,7 +25,6 @@ class SessionsController < ApplicationController
   
   private
     def successful_login
-      session[:user_id] = @current_user.id
       redirect_to(root_url)
     end
 

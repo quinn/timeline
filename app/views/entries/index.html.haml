@@ -6,7 +6,7 @@
   Tags
   =text_field_tag 'tags'
 #timeline
-  -Entry.each_hour do |entries, hour|
+  -current_user.entries.each_hour do |entries, hour|
     .hour{:id => "hour-#{hour}"}
       -if entries
         -entries.each do |entry|
