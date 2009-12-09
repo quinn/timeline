@@ -130,9 +130,12 @@ jQuery(function($) {
     var tag_link = $(this);
     var entry = new Entry(timeline, tag_link.parents('.entry'));
     var tag_field = $('input[name=tags]');
-    entry.save({'entry[tags]': tag_field.val()});
-    tag_link.text(tag_field.val());
-    tag_field.val('');
+    
+    if (!tag_field.val() == '') {
+      entry.save({'entry[tags]': tag_field.val()});
+      tag_link.text(tag_field.val());
+      tag_field.val('');
+    }
   });
   
   $('a[href=#stop]').live('click', function() {
