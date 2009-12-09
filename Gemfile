@@ -8,7 +8,7 @@ gem 'do_mysql'
 
 gem 'rails_datamapper'
 
-gem 'haml'
+gem 'haml-edge'
 
 ## Bundle the gems you use:
 # gem "bj"
