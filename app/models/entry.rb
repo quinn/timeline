@@ -14,6 +14,7 @@ class Entry
   
   has 1, :previous_entry, :model => 'Entry', :child_key => [ :ended_at ]
   belongs_to :next_entry, :model => 'Entry', :child_key => [ :ended_at ]
+  belongs_to :user
   
   def self.create_or_update params
     new_entry = new params
