@@ -3,13 +3,10 @@
 
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
+  include ApplicationHelper
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   
-  def current_user
-    User.get(session[:current_user_openid])
-  end
-  
-  def current_user= user
-    session[:current_user_openid] = user.openid
+  def login_required
+    redirect_to new_session_path unless signed_in?
   end
 end
