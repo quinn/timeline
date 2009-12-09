@@ -106,6 +106,9 @@ function Timeline(timeline_div) {
     this.current_entry = new Entry(this, random_color('hex'), now())
       .save({'entry[parent]': previous_start})
       .append();
+    if ($('input[name=tags]').val() != "") {
+      this.current_entry.dom.find('a').click();
+    }
   }
   
   this.stop = function() {

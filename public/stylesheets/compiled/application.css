@@ -9,6 +9,9 @@ a {
 #timeline .entry {
   height: 100px;
   width: 0%;
-  overflow: hidden; }
+  overflow: hidden;
+  float: left;
+  padding: 0 3px;
+  margin: 2px; }
   #timeline .entry .current_time {
     width: 10000px; }

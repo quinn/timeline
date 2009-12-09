@@ -21,7 +21,11 @@ class Entry
       return new_entry if new_entry.save
     rescue DataObjects::IntegrityError
       entry = Entry.get! new_entry.started_at
-      return entry if entry.update(new_entry.attributes)
+      attrs = new_entry.attributes
+      attrs.each{|k,v| 
+        attrs.delete(k) if v.blank?
+      }
+      return entry if entry.update(attrs)
     end
   end
   
@@ -76,7 +80,8 @@ class Entry
   end
   
   def length
-    ended_at.to_f - started_at.to_f
+    ending = ended_at ? ended_at : Time.now
+    ending.to_f - started_at.to_f
   end
   
   # big for now. will make real l8r
@@ -92,18 +97,19 @@ class Entry
     
     tags.each do |tag, entries|
       total_time = 0.0
-      catch(:ongoing) do      
+      
+      # catch(:ongoing) do      
         entries.each do |entry|
           total_time += entry.length
-          if entry.ended_at.nil?
-            total_time = "ongoing"
-            throw(:ongoing)
-          end
+          # if entry.ended_at.nil?
+          #   total_time = "ongoing"
+          #   throw(:ongoing)
+          # end
         end
         seconds = ((total_time % 3600) / 60).round
         seconds = (seconds.to_s.length == 1) ? "0#{seconds}" : seconds
         total_time = "#{(total_time / 3600).floor}:#{seconds}"
-      end
+      # end
       
       returning << {
         :tag => tag,
