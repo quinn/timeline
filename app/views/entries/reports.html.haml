@@ -1,4 +1,8 @@
--current_user.entries.todays_tags.each do |tag|
+=link_to 'Past', report_path(:offset => @offset + 1)
+-unless @offset < 1 
+  =link_to 'Future', report_path(:offset => @offset - 1)
+.day= @day
+-@tags.each do |tag|
   .tag
     =tag[:tag]
     \-

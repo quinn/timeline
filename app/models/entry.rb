@@ -85,11 +85,17 @@ class Entry
     ending.to_f - started_at.to_f
   end
   
+  def self.day offset = nil
+    offset = 0 unless offset
+    hours = (offset.to_i * 24).hours
+    between(Time.now.beginning_of_day - hours, Time.now.end_of_day - hours)
+  end
+  
   # big for now. will make real l8r
-  def self.todays_tags
+  def self.calculate_tags
     tags = {}
     returning = []
-    between(Time.now.beginning_of_day, Time.now.end_of_day).each do |entry|
+    all.each do |entry|
       entry.tags.split(",").map{|t| t.strip}.each do |tag|
         tags[tag] ||= []
         tags[tag] << entry
